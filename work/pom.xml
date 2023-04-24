@@ -1,0 +1,232 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+	<packaging>jar</packaging>
+	<parent>
+		<groupId>com.kakarote</groupId>
+		<artifactId>wk_crm</artifactId>
+		<version>0.0.1</version>
+
+	</parent>
+
+	<artifactId>work</artifactId>
+	<version>0.0.1-SNAPSHOT</version>
+	<name>work</name>
+	<description>项目管理</description>
+
+
+	<dependencies>
+
+		<dependency>
+			<groupId>org.springframework.cloud</groupId>
+			<artifactId>spring-cloud-starter-bootstrap</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>com.kakarote</groupId>
+			<artifactId>common</artifactId>
+			<version>0.0.1</version>
+		</dependency>
+		<!-- 通用core -->
+		<dependency>
+			<groupId>com.kakarote</groupId>
+			<artifactId>wk_common_web</artifactId>
+			<version>1.0.6</version>
+			<scope>system</scope>
+			<systemPath>${basedir}/src/main/resources/lib/wk_common_web-1.0.6.jar</systemPath>
+		</dependency>
+		<dependency>
+			<groupId>com.kakarote.ids</groupId>
+			<artifactId>provider</artifactId>
+			<version>1.0.1</version>
+			<scope>system</scope>
+			<systemPath>${basedir}/src/main/resources/lib/provider-1.0.1.jar</systemPath>
+		</dependency>
+		<!-- 文件上传 -->
+		<dependency>
+			<groupId>com.kakarote</groupId>
+			<artifactId>wk_common_file</artifactId>
+			<version>1.0.5</version>
+			<scope>system</scope>
+			<systemPath>${basedir}/src/main/resources/lib/wk_common_file-1.0.6.jar</systemPath>
+		</dependency>
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-web</artifactId>
+		</dependency>
+		<!-- elasticsearch 版本为7.15.2-->
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-data-elasticsearch</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>net.oneandone.reflections8</groupId>
+			<artifactId>reflections8</artifactId>
+			<version>0.11.7</version>
+		</dependency>
+		<dependency>
+			<groupId>com.alibaba</groupId>
+			<artifactId>easyexcel</artifactId>
+			<version>3.0.5</version>
+		</dependency>
+		<!-- 阿里云 ons -->
+		<dependency>
+			<groupId>com.aliyun.openservices</groupId>
+			<artifactId>ons-client</artifactId>
+			<version>1.8.8.3.Final</version>
+		</dependency>
+		<!--oss文件上传-->
+		<dependency>
+			<groupId>com.aliyun.oss</groupId>
+			<artifactId>aliyun-sdk-oss</artifactId>
+			<version>3.15.2</version>
+		</dependency>
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-quartz</artifactId>
+		</dependency>
+		<!-- aviator -->
+		<dependency>
+			<groupId>com.googlecode.aviator</groupId>
+			<artifactId>aviator</artifactId>
+			<version>5.3.2</version>
+		</dependency>
+		<!-- protobuf -->
+		<dependency>
+			<groupId>com.google.protobuf</groupId>
+			<artifactId>protobuf-java</artifactId>
+			<version>3.13.0</version>
+		</dependency>
+		<!--Knife4j的官方ui包-->
+		<dependency>
+			<groupId>com.github.xiaoymin</groupId>
+			<artifactId>knife4j-spring-ui</artifactId>
+			<version>3.0.3</version>
+		</dependency>
+	</dependencies>
+
+	<build>
+		<resources>
+			<resource>
+				<!-- xml放在java目录下-->
+				<directory>src/main/java/com/kakarote/${project.artifactId}/</directory>
+				<includes>
+					<include>**/*.xml</include>
+				</includes>
+			</resource>
+			<resource>
+				<directory>src/main/resources</directory>
+				<filtering>false</filtering>
+			</resource>
+			<resource>
+				<directory>src/main/webapp</directory>
+				<filtering>false</filtering>
+			</resource>
+		</resources>
+		<plugins>
+
+			<!--打包jar-->
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-jar-plugin</artifactId>
+				<configuration>
+					<archive>
+						<manifest>
+							<addClasspath>true</addClasspath>
+							<!--MANIFEST.MF 中 Class-Path 加入前缀-->
+							<classpathPrefix>lib/</classpathPrefix>
+							<!--jar包不包含唯一版本标识-->
+							<useUniqueVersions>false</useUniqueVersions>
+							<!--指定入口类-->
+							<mainClass>com.kakarote.work.WorkApplication</mainClass>
+						</manifest>
+						<manifestEntries>
+							<!--MANIFEST.MF 中 Class-Path 加入资源文件目录-->
+							<Class-Path>lib/wk_common_web-1.0.6.jar lib/provider-1.0.1.jar lib/wk_common_file-1.0.5.jar</Class-Path>
+						</manifestEntries>
+					</archive>
+					<outputDirectory>${project.build.directory}</outputDirectory>
+				</configuration>
+			</plugin>
+
+			<!--拷贝依赖 copy-dependencies-->
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-dependency-plugin</artifactId>
+				<executions>
+					<execution>
+						<id>copy-dependencies</id>
+						<phase>package</phase>
+						<goals>
+							<goal>copy-dependencies</goal>
+						</goals>
+						<configuration>
+							<outputDirectory>
+								${project.build.directory}/lib/
+							</outputDirectory>
+						</configuration>
+					</execution>
+				</executions>
+			</plugin>
+
+			<!--拷贝资源文件 copy-resources-->
+			<!--拷贝资源文件 copy-resources-->
+			<plugin>
+				<artifactId>maven-resources-plugin</artifactId>
+				<executions>
+					<execution>
+						<id>copy-resources</id>
+						<phase>package</phase>
+						<goals>
+							<goal>copy-resources</goal>
+						</goals>
+						<configuration>
+							<resources>
+								<resource>
+									<directory>src/main/resources/</directory>
+								</resource>
+							</resources>
+							<outputDirectory>${project.build.directory}/config</outputDirectory>
+						</configuration>
+					</execution>
+					<execution>
+						<id>copy-public</id>
+						<phase>package</phase>
+						<goals>
+							<goal>copy-resources</goal>
+						</goals>
+						<configuration>
+							<resources>
+								<resource>
+									<directory>src/main/webapp/public</directory>
+								</resource>
+							</resources>
+							<outputDirectory>${project.build.directory}/public</outputDirectory>
+						</configuration>
+					</execution>
+				</executions>
+			</plugin>
+
+			<plugin>
+				<artifactId>maven-assembly-plugin</artifactId>
+				<configuration>
+					<finalName>${artifactId}</finalName>
+					<appendAssemblyId>false</appendAssemblyId>
+					<descriptors>
+						<descriptor>../assembly.xml</descriptor>
+					</descriptors>
+				</configuration>
+				<executions>
+					<execution>
+						<id>make-assembly</id>
+						<phase>package</phase>
+						<goals>
+							<goal>single</goal>
+						</goals>
+					</execution>
+				</executions>
+			</plugin>
+		</plugins>
+	</build>
+
+</project>

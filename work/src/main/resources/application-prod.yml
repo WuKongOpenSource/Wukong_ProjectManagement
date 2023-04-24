@@ -1,0 +1,13 @@
+spring:
+  redis:
+    host: 127.0.0.1
+    port: 6379
+    password: 123456
+    database: 12
+    lettuce:
+      pool:
+        max-active: 300
+  datasource:
+    url: jdbc:mysql://192.168.1.116:3306/wk_crm_table?characterEncoding=utf8&useSSL=false&zeroDateTimeBehavior=convertToNull&tinyInt1isBit=false&serverTimezone=Asia/Shanghai&useAffectedRows=true&allowPublicKeyRetrieval=true
+    username: root
+    password: Admin001m

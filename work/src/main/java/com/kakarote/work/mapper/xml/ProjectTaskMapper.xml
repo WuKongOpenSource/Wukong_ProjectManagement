@@ -1,0 +1,380 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.kakarote.work.mapper.ProjectTaskMapper">
+    <select id="getProjectByTime" resultType="com.kakarote.work.entity.VO.ProjectTaskNumVO">
+        SELECT t1.DAY            AS updateTime,
+               COUNT(t2.task_id) AS num
+        FROM (SELECT DATE( create_time ) AS DAY FROM wk_temp_date t WHERE t.create_time BETWEEN #{startTime} and #{endTime}) t1
+                 LEFT JOIN (
+            SELECT
+                DATE ( a.update_time) DAY,
+		a.task_id
+        FROM
+            wk_project_task a
+        WHERE
+            a.project_id = #{projectId}
+          AND a.type IN ( 2
+            , 3
+            , 4 )
+          AND a.STATUS = 3
+          AND a.ishidden = 0
+            ) t2
+        ON t2.DAY = t1.DAY
+        GROUP BY
+            t1.DAY
+        ORDER BY
+            t1.DAY ASC
+    </select>
+    <select id="getTaskByTime" resultType="com.kakarote.work.entity.VO.ProjectTaskNumVO">
+        SELECT t1.DAY as updateTime,COUNT(t2.task_id)as num
+        FROM
+        ( SELECT DATE(create_time) AS DAY FROM wk_temp_date t WHERE t.create_time BETWEEN #{startTime} and #{endTime})
+        t1
+        LEFT JOIN
+        (
+        SELECT DATE( a.update_time ) DAY,a.task_id,a.type
+        FROM
+        wk_project_task a
+        WHERE
+        a.task_id in
+        <foreach collection="taskIds" item="taskId" open="(" separator="," close=")">
+            #{taskId}
+        </foreach>
+        AND a.STATUS = 3
+        AND a.ishidden = 0
+        ) t2 ON t2.DAY = t1.DAY
+        GROUP BY t1.DAY
+        ORDER BY
+        t1.DAY ASC
+    </select>
+    <select id="getTaskByTimeNoStart" resultType="com.kakarote.work.entity.VO.ProjectTaskNumVO">
+        SELECT t1.DAY as updateTime,COUNT(t2.task_id)as num
+        FROM
+        ( SELECT DATE(create_time) AS DAY FROM wk_temp_date t WHERE t.create_time BETWEEN #{startTime} and #{endTime})
+        t1
+        LEFT JOIN
+        (
+        SELECT DATE( a.update_time ) DAY,a.task_id,a.type
+        FROM
+        wk_project_task a
+        WHERE
+        a.task_id in
+        <foreach collection="taskIds" item="taskId" open="(" separator="," close=")">
+            #{taskId}
+        </foreach>
+        AND a.STATUS = 1
+        AND a.ishidden = 0
+        ) t2 ON t2.DAY = t1.DAY
+        GROUP BY t1.DAY
+        ORDER BY
+        t1.DAY ASC
+    </select>
+    <select id="getTaskByTimeRun" resultType="com.kakarote.work.entity.VO.ProjectTaskNumVO">
+        SELECT t1.DAY as updateTime,COUNT(t2.task_id)as num
+        FROM
+        ( SELECT DATE(create_time) AS DAY FROM wk_temp_date t WHERE t.create_time BETWEEN #{startTime} and #{endTime})
+        t1
+        LEFT JOIN
+        (
+        SELECT DATE( a.update_time ) DAY,a.task_id,a.type
+        FROM
+        wk_project_task a
+        WHERE
+        a.task_id in
+        <foreach collection="taskIds" item="taskId" open="(" separator="," close=")">
+            #{taskId}
+        </foreach>
+        AND a.STATUS = 2
+        AND a.ishidden = 0
+        ) t2 ON t2.DAY = t1.DAY
+        GROUP BY t1.DAY
+        ORDER BY
+        t1.DAY ASC
+    </select>
+    <select id="getTaskBurnout" resultType="com.kakarote.work.entity.VO.ProjectTaskBurnoutVO">
+
+        SELECT
+        t1.DAY AS updateTime,
+        sum( t1.actualHour ) as actualHour
+        FROM
+        (
+        SELECT
+        t1.`DAY`, t2.actualHour
+        FROM
+        ( SELECT DATE(create_time) AS DAY FROM wk_temp_date t WHERE t.create_time BETWEEN #{startTime,jdbcType=DATE} and
+        #{endTime,jdbcType=DATE}) t1
+        LEFT JOIN (
+        SELECT
+        DATE( a.update_time ) DAY,
+        sum( a.actual_hour ) actualHour
+        FROM
+        wk_project_task_time a
+        LEFT JOIN wk_project_task t ON a.task_id = t.task_id
+        WHERE
+        a.task_id IN
+        <foreach collection="taskIds" item="taskId" open="(" separator="," close=")">
+            #{taskId}
+        </foreach>
+        GROUP BY
+        a.update_time
+        ) t2 ON t2.DAY = t1.DAY
+
+        ) t1
+
+
+        GROUP BY
+        t1.DAY
+        ORDER BY
+        t1.DAY ASC
+    </select>
+    <select id="projectTaskExport" resultType="java.util.HashMap">
+        select * from wk_project_task where task_id in
+        <foreach collection="taskIds" item="taskId" open="(" separator="," close=")">
+            #{taskId}
+        </foreach>
+    </select>
+    <select id="getMaxNum" resultType="java.lang.Integer">
+        SELECT IFNULL(MAX(num), 0) num
+        FROM wk_project_task
+        WHERE project_id = #{projectId}
+    </select>
+
+    <select id="queryAddTaskPageWithUserSort" resultType="com.kakarote.work.entity.PO.ProjectTask">
+        SELECT * FROM
+        (
+            SELECT
+            pt.*,
+            IFNULL(us.sort_num,0) sort_num,
+            IFNULL(CASE WHEN us.`task_id` IS NULL THEN 1 ELSE 0 END , 0 ) task_add
+            FROM
+            wk_project_task pt
+            LEFT JOIN wk_project_task_user_sort us ON us.task_id = pt.task_id AND us.user_id = #{userId}
+            <where>
+                pt.pid is null
+                and pt.type <![CDATA[<>]]> 1
+                <if test="taskQuery.projectId != null">
+                    and pt.project_id = #{taskQuery.projectId}
+                </if>
+                <if test="taskQuery.startTime != null">
+                    and pt.start_time = #{taskQuery.startTime}
+                </if>
+                <if test="taskQuery.endTime != null">
+                    and pt.stop_time = #{taskQuery.endTime}
+                </if>
+                <if test="taskQuery.name != null and taskQuery.name != ''">
+                    and (pt.name LIKE CONCAT('%',#{taskQuery.name},'%') OR pt.num LIKE CONCAT('%',#{taskQuery.name},'%'))
+                </if>
+                <if test="taskQuery.mainUserId != null">
+                    and pt.main_user_id = #{taskQuery.mainUserId}
+                </if>
+                <if test="taskQuery.needBelongIteration != null and taskQuery.needBelongIteration == 2">
+                    and (pt.belong_iteration_id <![CDATA[<>]]> #{taskQuery.belongIterationId} or pt.belong_iteration_id is
+                    null)
+                </if>
+                <if test="taskQuery.needBelongIteration == null">
+                    and pt.belong_iteration_id is null
+                </if>
+                <if test="taskQuery.typeQuery != null and taskQuery.typeQuery.size() > 0">
+                    and pt.type in #{taskQuery.typeQuery}
+                </if>
+                <if test="taskQuery.priorityQuery!= null and taskQuery.priorityQuery.size() > 0">
+                    and pt.priority #{taskQuery.priorityQuery}
+                </if>
+                <if test="taskQuery.statusQuery != null and taskQuery.statusQuery.size() > 0">
+                    and pt.status in #{taskQuery.statusQuery}
+                </if>
+                <if test="taskQuery.belongIterationIdQuery != null and taskQuery.belongIterationIdQuery.size() > 0">
+                    and pt.belong_iteration_id in #{taskQuery.belongIterationIdQuery}
+                </if>
+                <if test="taskQuery.labelQuery != null and taskQuery.labelQuery.size() > 0">
+                    and pt.label in #{taskQuery.labelQuery}
+                </if>
+                <if test="taskQuery.mainUserIdQuery != null and taskQuery.mainUserIdQuery.size() > 0">
+                    and pt.main_user_id in #{taskQuery.mainUserIdQuery}
+                </if>
+            </where>
+            ORDER BY us.sort_num DESC
+        ) a
+        where task_add = 1
+    </select>
+
+
+    <select id="queryMaxTaskPageWithUserSort" resultType="java.lang.Long">
+        SELECT IFNULL(MAX(sort_num),0) sort_num FROM
+        (
+        SELECT
+        pt.*,
+        IFNULL(us.sort_num,0) sort_num,
+        IFNULL(CASE WHEN us.`task_id` IS NULL THEN 1 ELSE 0 END , 0 ) task_add
+        FROM
+        wk_project_task pt
+        LEFT JOIN wk_project_task_user_sort us ON us.task_id = pt.task_id  AND us.user_id = #{userId}
+        <where>
+            pt.pid is null
+            and pt.type <![CDATA[<>]]> 1
+            <if test="taskQuery.projectId != null">
+                and pt.project_id = #{taskQuery.projectId}
+            </if>
+            <if test="taskQuery.startTime != null">
+                and pt.start_time = #{taskQuery.startTime}
+            </if>
+            <if test="taskQuery.endTime != null">
+                and pt.stop_time = #{taskQuery.endTime}
+            </if>
+            <if test="taskQuery.name != null and taskQuery.name != ''">
+                and (pt.name LIKE CONCAT('%',#{taskQuery.name},'%') OR pt.num LIKE CONCAT('%',#{taskQuery.name},'%'))
+            </if>
+            <if test="taskQuery.mainUserId != null">
+                and pt.main_user_id = #{taskQuery.mainUserId}
+            </if>
+            <if test="taskQuery.needBelongIteration != null and taskQuery.needBelongIteration == 2">
+                and (pt.belong_iteration_id <![CDATA[<>]]> #{taskQuery.belongIterationId} or pt.belong_iteration_id is
+                null)
+            </if>
+            <if test="taskQuery.needBelongIteration == null">
+                and pt.belong_iteration_id is null
+            </if>
+            <if test="taskQuery.typeQuery != null and taskQuery.typeQuery.size() > 0">
+                and pt.type in #{taskQuery.typeQuery}
+            </if>
+            <if test="taskQuery.priorityQuery!= null and taskQuery.priorityQuery.size() > 0">
+                and pt.priority #{taskQuery.priorityQuery}
+            </if>
+            <if test="taskQuery.statusQuery != null and taskQuery.statusQuery.size() > 0">
+                and pt.status in #{taskQuery.statusQuery}
+            </if>
+            <if test="taskQuery.belongIterationIdQuery != null and taskQuery.belongIterationIdQuery.size() > 0">
+                and pt.belong_iteration_id in #{taskQuery.belongIterationIdQuery}
+            </if>
+            <if test="taskQuery.labelQuery != null and taskQuery.labelQuery.size() > 0">
+                and pt.label in #{taskQuery.labelQuery}
+            </if>
+            <if test="taskQuery.mainUserIdQuery != null and taskQuery.mainUserIdQuery.size() > 0">
+                and pt.main_user_id in #{taskQuery.mainUserIdQuery}
+            </if>
+        </where>
+        ORDER BY us.sort_num DESC
+        ) a
+        where task_add = 0
+    </select>
+
+
+    <select id="queryTaskPageWithUserSort" resultType="com.kakarote.work.entity.PO.ProjectTask">
+        SELECT
+        pt.*,
+        IFNULL(us.sort_num,0) sort_num
+        FROM
+        wk_project_task pt
+        LEFT JOIN wk_project_task_user_sort us ON us.task_id = pt.task_id AND us.user_id = #{userId}
+        <where>
+            pt.pid is null
+            and pt.type <![CDATA[<>]]> 1
+            <if test="taskQuery.projectId != null">
+                and pt.project_id = #{taskQuery.projectId}
+            </if>
+            <if test="taskQuery.startTime != null">
+                and pt.start_time = #{taskQuery.startTime}
+            </if>
+            <if test="taskQuery.endTime != null">
+                and pt.stop_time = #{taskQuery.endTime}
+            </if>
+            <if test="taskQuery.name != null and taskQuery.name != ''">
+                and (pt.name LIKE CONCAT('%',#{taskQuery.name},'%') OR pt.num LIKE CONCAT('%',#{taskQuery.name},'%'))
+            </if>
+            <if test="taskQuery.mainUserId != null">
+                and pt.main_user_id = #{taskQuery.mainUserId}
+            </if>
+            <if test="taskQuery.needBelongIteration != null and taskQuery.needBelongIteration == 2">
+                and (pt.belong_iteration_id <![CDATA[<>]]> #{taskQuery.belongIterationId} or pt.belong_iteration_id is
+                null)
+            </if>
+            <if test="taskQuery.needBelongIteration == null">
+                and pt.belong_iteration_id is null
+            </if>
+            <if test="taskQuery.typeQuery != null and taskQuery.typeQuery.size() > 0">
+                and pt.type in #{taskQuery.typeQuery}
+            </if>
+            <if test="taskQuery.priorityQuery!= null and taskQuery.priorityQuery.size() > 0">
+                and pt.priority #{taskQuery.priorityQuery}
+            </if>
+            <if test="taskQuery.statusQuery != null and taskQuery.statusQuery.size() > 0">
+                and pt.status in #{taskQuery.statusQuery}
+            </if>
+            <if test="taskQuery.belongIterationIdQuery != null and taskQuery.belongIterationIdQuery.size() > 0">
+                and pt.belong_iteration_id in #{taskQuery.belongIterationIdQuery}
+            </if>
+            <if test="taskQuery.labelQuery != null and taskQuery.labelQuery.size() > 0">
+                and pt.label in #{taskQuery.labelQuery}
+            </if>
+            <if test="taskQuery.mainUserIdQuery != null and taskQuery.mainUserIdQuery.size() > 0">
+                and pt.main_user_id in #{taskQuery.mainUserIdQuery}
+            </if>
+        </where>
+        ORDER BY us.sort_num DESC
+    </select>
+
+    <select id="queryUserTaskList" resultType="com.kakarote.work.entity.PO.ProjectTask">
+        SELECT t.*,
+               (SELECT name FROM wk_project WHERE project_id = t.project_id)         AS project_name,
+               (SELECT name FROM wk_project WHERE project_id = t.project_id)         AS belong_project_name,
+               (select ps.status_name
+                from wk_project_event_status pes
+                         INNER JOIN wk_project_status ps on pes.project_status_id = ps.project_status_id
+                where pes.id = t.board_status_id)    as boardStatusName,
+                p.type project_type,
+                p.icon project_icon
+        FROM wk_project_task t
+        LEFT JOIN
+        wk_project p ON t.project_id = p.project_id
+        where t.status!=3   and p.status=1 and t.main_user_id=#{userTaskQueryBO.mainUserId}
+        <if test="userTaskQueryBO.projectId != null">
+            and t.project_id = #{userTaskQueryBO.projectId}
+        </if>
+        <if test="userTaskQueryBO.startTime != null">
+            and t.start_time = #{userTaskQueryBO.startTime}
+        </if>
+        <if test="userTaskQueryBO.endTime != null">
+            and t.stop_time = #{userTaskQueryBO.endTime}
+        </if>
+        <if test="userTaskQueryBO.name != null and userTaskQueryBO.name != ''">
+            and (t.name LIKE CONCAT('%',#{userTaskQueryBO.name},'%') OR t.num LIKE CONCAT('%',#{userTaskQueryBO.name},'%'))
+        </if>
+        <if test="userTaskQueryBO.type != null">
+            and t.type=#{userTaskQueryBO.type}
+        </if>
+        <if test="userTaskQueryBO.projectId == null and userTaskQueryBO.type == null">
+            and t.type <![CDATA[<>]]> 1
+        </if>
+    </select>
+
+    <select id="queryUserTaskCount" resultType="com.kakarote.work.entity.VO.ProjectUserTaskCountVO">
+        SELECT
+            IFNULL( COUNT( t.task_id ), 0 ) `all`,
+            IFNULL( sum( CASE WHEN t.`type` = 1 THEN 1 ELSE 0 END ), 0 ) iteration,
+            IFNULL( sum( CASE WHEN t.`type` = 2 THEN 1 ELSE 0 END ), 0 ) need,
+            IFNULL( sum( CASE WHEN t.`type` = 3 THEN 1 ELSE 0 END ), 0 ) task,
+            IFNULL( sum( CASE WHEN t.`type` = 4 THEN 1 ELSE 0 END ), 0 ) defect
+        FROM
+            wk_project_task t LEFT JOIN  wk_project p ON t.project_id = p.project_id
+        WHERE
+            t.STATUS != 3   and p.status=1
+	AND t.main_user_id = #{userTaskQueryBO.mainUserId}
+    </select>
+    <select id="getTaskExtendInfo" resultType="com.kakarote.work.entity.PO.ProjectTask">
+        SELECT
+            pt.task_id,
+            pt.NAME,
+            ( SELECT `name` FROM wk_project_task WHERE task_id = pt.belong_iteration_id ) belong_iteration_name,
+            ( SELECT `name` FROM wk_project_task WHERE task_id = pt.related_demand_id ) related_demand_name,
+            s.status_name as board_status_name
+        FROM
+            wk_project_task pt
+                LEFT JOIN ( SELECT pes.id, ps.status_name FROM wk_project_event_status pes LEFT JOIN wk_project_status ps ON pes.project_status_id = ps.project_status_id ) s ON s.id = pt.board_status_id
+        WHERE
+            task_id IN
+            <foreach collection="taskIds" item="taskId" open="(" separator="," close=")">
+                #{taskId}
+            </foreach>
+    </select>
+
+</mapper>

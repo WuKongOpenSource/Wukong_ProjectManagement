@@ -1,0 +1,34 @@
+.main {
+  position: relative;
+  padding: 0 #{$--interval-base * 5};
+
+  &-header {
+    .title {
+      font-size: $--font-size-xxlarge;
+      font-weight: $--font-weight-primary;
+      color: $--color-text-primary;
+    }
+
+    &.is-filter-header {
+      margin-top: 30px;
+      margin-bottom: 20px;
+    }
+
+    .search-input {
+      width: 220px;
+    }
+
+    // 按钮切换
+    .tabs {
+      display: inline-block;
+
+      &-label {
+        margin-right: $--interval-base;
+      }
+    }
+
+    .search-input + .tabs {
+      margin-left: #{$--interval-base * 3};
+    }
+  }
+}

@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.kakarote.work.mapper.ProjectFieldNumberDataMapper">
+    <select id="queryMaxNumber" resultType="java.lang.Integer">
+        SELECT max(field_number) FROM wk_project_field_number_data
+        WHERE field_id = #{fieldId}
+        <if test="startDate != null">
+            and create_time BETWEEN #{startDate} AND #{endDate}
+        </if>
+    </select>
+    <insert id="saveBatchData">
+        INSERT INTO wk_project_${tableName}_data (`id`,`field_id`, `name`, `value`, `create_time`, `batch_id`,`create_user_id`)
+        VALUES (#{id},#{fieldId}, #{name}, #{value}, now(), #{batchId}, #{createUserId})
+    </insert>
+
+    <update id="updateBatchData">
+        update wk_project_${tableName}_data set `value`= #{value} where batch_id =  #{batchId} and `name` = #{name}
+    </update>
+
+    <select id="selectBatchData" resultType="java.lang.Integer">
+        select count(*) from wk_project_${tableName}_data where batch_id =  #{batchId} and `name` = #{name}
+    </select>
+</mapper>

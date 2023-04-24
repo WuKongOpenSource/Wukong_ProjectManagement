@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.kakarote.work.mapper.ProjectBoardStatusMapper">
+
+    <select id="queryBoardStatusByBoardId" resultType="com.kakarote.work.entity.VO.ProjectBoardStatusVO">
+        select  bs.project_board_status_id,ps.status_name,bs.board_id,ps.status_type,es.id
+            as status_id ,bs.sorting  from   wk_project_board_status bs
+    INNER JOIN wk_project_event_status es on bs.status_id=es.id INNER JOIN
+                wk_project_status ps on es.project_status_id=ps.project_status_id
+        where bs.board_id=#{boardId}
+    </select>
+    <select id="queryBoardStatusIdByBoardId" resultType="java.lang.Long">
+        SELECT
+            bs.project_board_status_id
+        FROM
+            wk_project_board_status bs
+                INNER join  wk_project_event_status es ON es.id = bs.status_id
+                INNER join wk_project_status ps ON ps.project_status_id = es.project_status_id where ps.sys_type=1 and bs.board_id=#{boardId} LIMIT 1
+    </select>
+    <select id="queryBoardStatusByStatusId" resultType="com.kakarote.work.entity.VO.ProjectBoardStatusVO">
+        select  bs.project_board_status_id,ps.status_name,bs.board_id,ps.status_type,es.id
+            as status_id ,bs.sorting  from   wk_project_board_status bs
+                                                 INNER JOIN wk_project_event_status es on bs.status_id=es.id INNER JOIN
+                                             wk_project_status ps on es.project_status_id=ps.project_status_id
+        where bs.project_board_status_id=#{projectBoardStatusId}
+    </select>
+</mapper>

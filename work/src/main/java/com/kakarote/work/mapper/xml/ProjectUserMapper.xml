@@ -1,0 +1,96 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.kakarote.work.mapper.ProjectUserMapper">
+    <select id="queryRolesRelation" resultType="com.kakarote.work.entity.VO.ProjectRolesGroupVO">
+    SELECT
+	a.role_id,
+	a.role_name,
+	IF(b.num is null, 0, b.num) num,
+	a.create_time
+    FROM
+	( SELECT * FROM wk_admin_role WHERE role_type = 8 ) a
+	LEFT JOIN (
+	SELECT
+		u.role_id,
+		r.role_name,
+		count(*) num,
+		r.create_time
+	FROM
+		wk_project_user u
+		LEFT JOIN wk_admin_role r ON u.role_id = r.role_id
+	WHERE
+		u.project_id = #{projectId}
+		AND r.role_type = 8
+	GROUP BY
+		u.role_id
+	) b
+	ON a.role_id = b.role_id
+    </select>
+
+
+	<select id="queryProjectAdminUser" resultType="java.lang.Long">
+		select u.user_id from wk_project_user u
+								   INNER JOIN wk_admin_role r on r.role_id=u.role_id
+		where u.project_id=#{projectId}  and r.label=1;
+	</select>
+
+	<!--查询我可访问的项目id集合-->
+	<select id="queryMyProjectIds" resultType="java.lang.Long">
+			select p.project_id  from wk_project_user u left  join wk_project p on p.project_id=u.project_id where p.status=1
+			and u.user_id = #{userId}
+	</select>
+
+	<select id="getProjectAuth" resultType="com.kakarote.work.entity.PO.AdminMenu">
+
+		SELECT
+			a.menu_id,
+			a.parent_id,
+			a.menu_name,
+			a.realm,
+			CASE
+				WHEN ((IFNULL(b.menu_id,0)) <![CDATA[!=]]> 0)  || ( b.is_open &amp; a.project_type = 2 )
+                    THEN
+                    1
+                ELSE 0
+		END project_auth
+		FROM
+            (
+                SELECT
+                    menu_id,
+                    parent_id,
+                    menu_name,
+                    realm,
+                    project_type
+                FROM
+                    wk_admin_menu
+                WHERE
+                    menu_id = 149
+                   OR parent_id IN ( 149, 152, 1151, 1157, 1160 )
+            ) a
+                LEFT JOIN (
+                SELECT
+                    p.project_id,
+                    p.is_open,
+                    c.menu_id
+                FROM
+                    wk_project p
+                        LEFT JOIN (
+                        SELECT
+                            project_id,
+                            menu_id
+                        FROM
+                            wk_project_user AS pu
+                                INNER JOIN wk_admin_role_menu AS rm ON pu.role_id = rm.role_id
+                        WHERE
+                            pu.user_id = #{userId}
+		AND pu.project_id = #{projectId}
+		) c ON p.project_id = c.project_id
+		WHERE
+		c.project_id = #{projectId}
+		GROUP BY
+		c.menu_id
+		) b ON ( a.menu_id = b.menu_id OR a.parent_id = b.menu_id )
+		GROUP BY
+		a.menu_id
+	</select>
+</mapper>

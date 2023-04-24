@@ -1,0 +1,295 @@
+// 参与人
+.participant {
+  position: relative;
+
+  &-title {
+    margin-bottom: 10px;
+    color: $--color-text-secondary;
+  }
+
+  &-bd {
+    min-height: 28px;
+
+    .owner-list {
+      position: relative;
+      display: inline-block;
+      width: 38px;
+      height: 38px;
+      margin-right: 10px;
+      margin-right: -13px;
+      border: 3px solid $--color-white;
+      border-radius: 50%;
+
+      .el-icon-close {
+        position: absolute;
+        top: -7px;
+        left: -5px;
+        z-index: 3;
+        width: 15px;
+        height: 15px;
+        color: #fff;
+        cursor: pointer;
+        background: #ccc;
+        border-radius: 50%;
+        opacity: 0;
+      }
+    }
+
+    .owner-list:hover {
+      .el-icon-close {
+        opacity: 1;
+      }
+    }
+
+    .owner-list-fold:nth-last-child(1) {
+      margin-right: 0;
+    }
+
+    .owner-list-button {
+      z-index: 3;
+      width: 38px;
+      height: 38px;
+      padding: 0;
+      margin-right: -13px;
+      color: $--color-white;
+      background: $--color-n90;
+      border: 3px solid $--color-white;
+      border-radius: 50%;
+    }
+  }
+
+  &-add {
+    display: inline-block;
+    width: 32px;
+    height: 32px;
+    font-size: 12px;
+    line-height: 32px;
+    color: $--color-text-primary;
+    text-align: center;
+    cursor: pointer;
+    background-color: $--color-n20;
+    border-radius: 16px;
+  }
+
+  &-add:hover {
+    color: $--color-white;
+    background-color: $--color-n90;
+  }
+}
+
+.owner-list-dropdown {
+  width: 200px;
+  max-height: 300px;
+  overflow-y: auto;
+
+  &-list {
+    position: relative;
+    display: flex;
+    align-items: center;
+    padding-top: 5px;
+    padding-bottom: 5px;
+    border-left: 2px solid $--color-white;
+
+    &:hover {
+      background: $--color-n20 !important;
+      border-left: 2px solid $--color-b400;
+    }
+
+    &:hover .owner-list-dropdown-i {
+      display: inline-block;
+      color: $--color-n500;
+    }
+
+    &:hover .owner-list-dropdown-text {
+      color: $--color-n500;
+    }
+  }
+
+  &-text {
+    display: inline-block;
+    width: 80px;
+    height: 32px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  &-i {
+    position: absolute;
+    top: 18px;
+    right: 10px;
+    display: none;
+    margin-left: 60px;
+  }
+}
+
+// 标签
+.label {
+  &-title {
+    margin-bottom: 10px;
+    font-size: 12px;
+    color: $--color-text-secondary;
+  }
+
+  white-space: normal;
+
+  .item-color {
+    display: inline-block;
+    height: 22px;
+    padding: 0 10px;
+    margin-right: 5px;
+    margin-bottom: 5px;
+    font-size: 12px;
+    line-height: 22px;
+    color: #fff;
+    border-radius: 3px;
+  }
+
+  .add-tag {
+    display: inline-block;
+  }
+}
+
+// 添加btn
+.add-btn {
+  display: inline-block;
+  min-width: 92px;
+  padding: 3px 10px;
+  margin-top: 8px;
+  font-size: 12px;
+  color: $--color-text-primary;
+  text-align: center;
+  cursor: pointer;
+  background-color: $--button-default-background-color;
+  border-radius: $--border-radius-base;
+
+  .wk-l-plus {
+    font-size: 12px;
+  }
+}
+
+.add-btn:hover {
+  background-color: $--button-hover-background-color;
+}
+
+// 描述
+.description {
+  position: relative;
+  cursor: pointer;
+
+  &-content {
+    font-size: 14px;
+    line-height: 18px;
+    color: $--color-text-primary;
+    word-wrap: break-word;
+    white-space: pre-wrap;
+  }
+
+  &-empty {
+    color: #2362fb;
+
+    .color-label {
+      color: $--color-text-secondary;
+    }
+
+    button {
+      margin-left: 5px;
+    }
+  }
+
+  .btn-box {
+    margin-top: 10px;
+  }
+
+  .el-textarea /deep/.el-textarea__inner {
+    resize: none;
+  }
+}
+
+// 子任务
+.sub-task-all {
+  background: $--color-white;
+  border-radius: 4px;
+  box-shadow: $--box-shadow-bottom-light;
+
+  &:hover {
+    box-shadow: $--box-shadow-hover-bottom-light;
+  }
+}
+
+.sub-task {
+  position: relative;
+  height: 48px;
+  font-size: 14px;
+  border-bottom: $--border-base;
+
+  &:nth-last-child(1) {
+    border-bottom: none;
+  }
+
+  &:hover {
+    background-color: $--color-n20;
+  }
+
+  &__hd {
+    // 解决多选框样式
+    .el-checkbox /deep/ .el-checkbox__inner {
+      width: 16px;
+      height: 16px;
+    }
+
+    .el-checkbox /deep/ .el-checkbox__inner::after {
+      top: 0;
+      left: 4px;
+      width: 4px;
+      height: 10px;
+      border-width: 2px;
+    }
+  }
+
+  &__bd {
+    position: relative;
+    flex: 1;
+    margin-left: 16px;
+  }
+
+  &__bd.is-checked {
+    color: #8f8f8f;
+    text-decoration: line-through;
+  }
+
+  .edit-del-box {
+    flex-shrink: 0;
+    margin-left: 8px;
+  }
+
+  .bg-color {
+    flex-shrink: 0;
+    font-size: 12px;
+  }
+
+  .user-img {
+    flex-shrink: 0;
+    margin-left: 10px;
+  }
+}
+
+// 附件
+.upload-file /deep/ .el-upload-list--picture {
+  display: none;
+}
+
+.edit-del-dropdown {
+  margin-left: 16px;
+}
+
+.affix-all {
+  margin-top: 20px;
+  background: $--color-white;
+  border-radius: 4px;
+  box-shadow: $--box-shadow-bottom-light;
+
+  &:hover {
+    box-shadow: $--box-shadow-hover-bottom-light;
+  }
+}

@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.kakarote.work.mapper.ProjectMapper">
+    <select id="queryRoleName" resultType="java.lang.String">
+        select a.role_name
+        from wk_admin_role as a
+        where a.role_id = #{roleId}
+    </select>
+    <select id="queryOwnerRoleList" resultType="com.kakarote.work.entity.BO.ProjectOwnerRoleSimpleBO">
+        select a.user_id,a.role_id, c.role_name
+        from wk_project_user as a
+                 left join wk_admin_role as c on a.role_id = c.role_id
+        where a.project_id = #{projectId}
+    </select>
+    <select id="getProjectCount" resultType="com.kakarote.work.common.project.ProjectCountBO">
+
+        SELECT
+            p.project_id,
+            IFNULL(COUNT( pc.user_id ),0) coll_count,
+            IFNULL(sum( CASE WHEN pt.`status` = 1 THEN 1 ELSE 0 END ),0) task_one_count,
+            IFNULL(sum( CASE WHEN pt.`status` = 2 THEN 1 ELSE 0 END ),0) task_two_count,
+            IFNULL(sum( CASE WHEN pt.`status` = 3 THEN 1 ELSE 0 END ),0) task_three_count
+        FROM
+            wk_project p
+                LEFT JOIN wk_project_collect pc ON p.project_id = pc.project_id AND pc.user_id = #{userId}
+                LEFT JOIN wk_project_task pt ON pt.project_id = p.project_id
+        WHERE p.project_id IN
+            <foreach collection="projectIds" index="index" open="(" close=")" separator="," item="id">
+                #{id}
+            </foreach>
+        GROUP BY
+            p.project_id
+
+
+    </select>
+    <select id="allProject" resultType="com.kakarote.work.entity.PO.Project">
+        select * from  wk_project;
+    </select>
+
+
+</mapper>

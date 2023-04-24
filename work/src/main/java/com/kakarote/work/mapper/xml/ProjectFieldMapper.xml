@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.kakarote.work.mapper.ProjectFieldMapper">
+    <delete id="deleteFieldDataByIds">
+        DELETE FROM  wk_project_${table}_data  WHERE field_id = #{fieldId}
+    </delete>
+    <delete id="deleteDataByIds">
+        DELETE FROM  wk_project_data  WHERE field_id = #{fieldId}
+    </delete>
+</mapper>

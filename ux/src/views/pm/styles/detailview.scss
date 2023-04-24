@@ -1,0 +1,9 @@
+/** 客户管理详情页面的 css 侧滑进入的详情 */
+.d-view {
+  position: fixed;
+  top: $--detail-view-top;
+  right: 0;
+  bottom: 0;
+  width: $--detail-width-base;
+  min-width: 926px;
+}

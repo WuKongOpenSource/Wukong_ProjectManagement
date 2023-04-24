@@ -1,0 +1,148 @@
+@import "./detailview.scss";
+
+.wk-page-header {
+  padding: 24px 40px 0;
+}
+
+.wk-table-header {
+  margin-top: 30px;
+  margin-bottom: 20px;
+  line-height: 32px;
+}
+
+.crm-container {
+  padding: 0 40px;
+  padding-bottom: 16px;
+}
+
+.table-head-container {
+  margin-top: 30px;
+}
+
+// 列表状态
+.status_button {
+  display: inline-block;
+  padding: 1px 6px;
+  margin: 0 auto;
+  font-size: 12px;
+  border: 1px solid $--border-color-base;
+  border-radius: $--border-radius-base;
+}
+
+.status-mark {
+  display: inline-block;
+  width: 8px;
+  height: 8px;
+  border-radius: 4px;
+}
+
+.customer-lock {
+  color: $--color-r300;
+}
+
+.deal-suc {
+  display: inline-block;
+  width: $--interval-base;
+  height: $--interval-base;
+  background-color: $--color-g300;
+  border-radius: #{$--interval-base / 2};
+}
+
+.deal-un {
+  display: inline-block;
+  width: $--interval-base;
+  height: $--interval-base;
+  background-color: $--color-r300;
+  border-radius: #{$--interval-base / 2};
+}
+
+// 列表金额
+.money-bar {
+  position: absolute;
+  top: 0;
+  left: 0;
+  line-height: 32px !important;
+  color: $--color-text-regular;
+}
+
+// 关注
+.focus-icon {
+  font-size: 18px;
+  font-weight: bold;
+  color: $--color-n40;
+  cursor: pointer;
+
+  .wk-focus-on {
+    font-size: 13px;
+  }
+
+  &.active {
+    color: #fac23d;
+  }
+
+  &.is-disabled {
+    color: $--color-n20;
+    cursor: not-allowed;
+  }
+}
+
+// 呼叫按钮
+.wk-call-btn {
+  padding: 3px;
+  font-size: 12px;
+}
+
+/deep/.el-table {
+  // 单选时，去掉全选勾选框
+  &.no-all-selection {
+    thead {
+      .el-table-column--selection {
+        .cell {
+          display: none;
+        }
+      }
+    }
+  }
+}
+
+/deep/  .el-menu {
+  display: inline-block;
+  margin: 0 28px;
+  background-color: initial;
+
+  .el-menu-item {
+    padding: 0;
+    font-size: 16px;
+    font-weight: bold;
+    color: #2a304d;
+
+    &:focus,
+    &:hover {
+      background: initial;
+    }
+
+    &.is-active {
+      border-width: 3px;
+    }
+
+    img {
+      width: 30px;
+      margin-right: 5px;
+    }
+
+    * {
+      transform: translateY(-1.5px);
+    }
+  }
+
+  .el-menu-item + .el-menu-item {
+    margin-left: 40px;
+  }
+}
+
+.field-set-wrap {
+  position: absolute;
+  top: -1px;
+  right: 0;
+  z-index: 1;
+}

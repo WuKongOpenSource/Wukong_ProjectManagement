@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.kakarote.work.mapper.ProjectTaskTimeMapper">
+
+    <select id="queryProjectTaskTimeList" resultType="com.kakarote.work.entity.VO.ProjectTaskTimeListVO">
+        select wpt.task_id,wpt.type, wpt.name,wpt.belong_iteration_id, (SELECT sum(wptt.actual_hour) FROM
+        wk_project_task_time as wptt WHERE wptt.task_id
+        = wpt.task_id) as totalTime from
+        wk_project_task wpt
+        where 1 = 1
+        <if test="projectGanttQueryBO.projectId != null">
+            and wpt.project_id = #{projectGanttQueryBO.projectId}
+        </if>
+    </select>
+
+    <select id="queryProjectTaskTime" resultType="java.util.HashMap">
+        SELECT
+        dateType.create_time,
+        (SELECT actual_hour FROM wk_project_task_time AS wptt WHERE DATE_FORMAT( wptt.begin_time, '%Y-%m-%d' ) =
+        dateType.create_time
+        <if test="taskId != null">
+            and task_id = #{taskId}
+        </if>
+        ) as actual_hour
+        FROM
+        ( SELECT DATE_FORMAT(create_time, '%Y-%m-%d') as create_time FROM wk_temp_date WHERE 1 = 1
+        <if test="projectGanttQueryBO.beginTime != null and projectGanttQueryBO.endTime != null">
+            and create_time
+            BETWEEN #{projectGanttQueryBO.beginTime} AND #{projectGanttQueryBO.endTime}
+        </if>
+        ) AS dateType
+    </select>
+
+    <select id="queryProjectTaskTimeByTaskId" resultType="com.kakarote.work.entity.VO.ProjectTaskTimeVO">
+        select wpt.task_id, wpt.actual_hour, (SELECT sum(wptt.actual_hour) FROM wk_project_task_time as wptt WHERE
+        wptt.task_id
+        = wpt.task_id) as registeredHours from
+        wk_project_task wpt
+        where 1 = 1
+        <if test="taskId != null">
+            and wpt.task_id = #{taskId}
+        </if>
+    </select>
+    <select id="queryProjectTaskTimeMaxAndMin" resultType="com.kakarote.work.entity.VO.ProjectTaskTimeMaxAndMinVO">
+        SELECT MIN(tt.begin_time) as begin_time, MAX(tt.end_time) as end_time
+        from wk_project_task_time tt
+                 INNER JOIN wk_project_task pt on tt.task_id = pt.task_id
+        where pt.project_id = #{projectId}
+    </select>
+
+</mapper>

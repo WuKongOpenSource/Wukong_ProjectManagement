@@ -1,0 +1,50 @@
+server:
+  port: 48443
+spring:
+  main:
+    allow-circular-references: true
+  profiles:
+    active: core,dev
+  application:
+    name: work
+  mvc:
+    pathmatch:
+      matching-strategy: ant_path_matcher
+  cloud:
+    nacos:
+      config:
+        enabled: true
+        server-addr: 127.0.0.1:8848
+        file-extension: yaml
+        prefix: work
+      discovery:
+        enabled: true
+        server-addr: 127.0.0.1:8848
+    sentinel:
+      filter:
+        enabled: false
+      transport:
+        dashboard: 127.0.0.1:8079
+      datasource:
+        flow:
+          server-addr: 127.0.0.1:8848
+          dataId: ${spring.application.name}-flow-rules
+          groupId: SENTINEL_GROUP
+          rule-type: flow
+mybatis-plus:
+  configuration:
+    map-underscore-to-camel-case: true
+jetcache:
+  statIntervalMinutes: 0
+  areaInCacheName: false
+  local:
+    default:
+      type: caffeine
+      keyConvertor: fastjson
+  remote:
+    default:
+      type: redis.lettuce
+      keyConvertor: fastjson
+      #mode: cluster
+      # 不需要password的redis连接为 redis://127.0.0.1:6379/
+      uri: redis://${spring.redis.password}@${spring.redis.host}:${spring.redis.port}/

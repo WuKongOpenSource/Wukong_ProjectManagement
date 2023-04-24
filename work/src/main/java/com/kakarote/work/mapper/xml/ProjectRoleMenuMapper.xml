@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.kakarote.work.mapper.ProjectRoleMenuMapper">
+
+    <insert id="initProjectRole">
+        INSERT INTO `wk_admin_role` VALUES
+        <foreach collection="dataList" item="item" open="" separator="," close="">
+            (#{item.managerRoleId}, '项目管理员', '1', null, '1', '5','1','2', #{item.date}, #{item.userId}, #{item.date}, #{item.userId}),
+            (#{item.roleId1}, '默认角色', 8, '默认角色', 1, 5, 1, 0,  #{item.date}, #{item.userId}, #{item.date}, #{item.userId}),
+            (#{item.roleId2}, '系统管理员', 8, '系统管理员', 1, 5, 1, 1,  #{item.date}, #{item.userId}, #{item.date}, #{item.userId}),
+            (#{item.roleId3}, '开发', 8, '开发', 1, 5, 1, 5,  #{item.date}, #{item.userId}, #{item.date}, #{item.userId}),
+            (#{item.roleId4}, '产品', 8, '产品', 1, 5, 1, 6,  #{item.date}, #{item.userId}, #{item.date}, #{item.userId}),
+            (#{item.roleId5}, '测试', 8, '测试', 1, 5, 1, 7,  #{item.date}, #{item.userId}, #{item.date}, #{item.userId}),
+            (#{item.roleId6}, '项目经理', 8, '项目经理', 1, 5, 1, 8,  #{item.date}, #{item.userId}, #{item.date}, #{item.userId}),
+            (#{item.roleId7}, '运维', 8, '运维', 1, 5, 1, 9,  #{item.date}, #{item.userId}, #{item.date}, #{item.userId})
+        </foreach>
+    </insert>
+
+    <insert id="initProjectStatus">
+        INSERT INTO `wk_project_status` VALUES
+        <foreach collection="dataList" item="item" open="" separator="," close="">
+            (#{item.AUTO_ID1}, '未开始', 1, '未开始', 1,  '2022-10-01 00:00:00', NULL, NULL, NULL, 1),
+            (#{item.AUTO_ID2}, '进行中',  2, '进行中', 1,  '2022-10-01 00:00:00', NULL, NULL, NULL, 1),
+            (#{item.AUTO_ID3}, '已完成',  3, '已完成', 1,  '2022-10-01 00:00:00', NULL, NULL, NULL, 1)
+        </foreach>
+    </insert>
+
+    <insert id="initRoleMenuList">
+        INSERT INTO `wk_admin_role_menu` VALUES
+        <foreach collection="dataList" item="item" open="" separator="," close="">
+            (#{item.id}, #{item.roleId}, #{item.menuId}, #{item.createTime}, #{item.createUserId}, #{item.createTime}, null)
+        </foreach>
+    </insert>
+</mapper>

@@ -1,0 +1,131 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.kakarote.work.mapper.ProjectEventStatusMapper">
+    <select id="queryEventStatusByEventId" resultType="com.kakarote.work.entity.PO.ProjectEventStatus">
+        select pes.id,
+               pes.project_event_id,
+               ps.sys_type,
+               ps.status_name,
+               ps.project_status_id,
+               ps.status_type,
+               pes.init_status
+               ,pes.use_status
+        from wk_project_event_status pes
+                 INNER JOIN wk_project_status ps on pes.project_status_id = ps.project_status_id
+        where (pes.use_status=1 or pes.use_status=2)  and  pes.project_event_id = #{eventId}
+    </select>
+
+    <select id="queryEventStatusByEventIdAndSysType" resultType="com.kakarote.work.entity.PO.ProjectEventStatus">
+        SELECT
+            pes.id,
+            pes.project_event_id,
+            ps.sys_type,
+            ps.status_name,
+            ps.project_status_id,
+            ps.status_type,
+            pes.init_status,
+            pes.use_status
+        FROM
+            wk_project_event_status pes
+                INNER JOIN wk_project_status ps ON pes.project_status_id = ps.project_status_id
+        WHERE
+            ( pes.use_status = 1 OR pes.use_status = 2 )
+          AND pes.project_event_id = #{eventId} AND pes.project_id = #{projectId}
+          <if test=" sysType != null ">
+              AND ps.sys_type = #{sysType}
+          </if>
+
+    </select>
+
+    <select id="notAddStatus" resultType="com.kakarote.work.entity.PO.ProjectEventStatus">
+        select es.id, es.project_event_id, ps.sys_type, ps.status_name, ps.project_status_id, ps.status_type,es.sorting
+        from wk_project_event_status es
+                 INNER JOIN wk_project_status ps on es.project_status_id = ps.project_status_id
+        where (es.use_status =1 or es.use_status = 2) and  es.project_event_id = #{eventId} and es.project_id =#{projectId}
+          and es.id not in
+              (select bs.status_id
+               from wk_project_board_status bs
+               where bs.board_id in
+                     (select srb.id
+                      from wk_project_scheme_relation_board srb
+                      where srb.scheme_relation_id = #{schemeRelationId}));
+    </select>
+    <select id="queryEventStatusByEventStatusId" resultType="com.kakarote.work.entity.PO.ProjectEventStatus">
+        select pes.id,
+               pes.project_event_id,
+               pes.use_status,
+               ps.sys_type,
+               ps.status_name,
+               ps.project_status_id,
+               ps.status_type,
+               pes.init_status,
+        from wk_project_event_status pes
+                 INNER JOIN wk_project_status ps on pes.project_status_id = ps.project_status_id
+        where pes.id = #{eventStatusId}
+    </select>
+    <select id="queryEventStatusByEventIdAndUseStatus" resultType="com.kakarote.work.entity.PO.ProjectEventStatus">
+        select pes.id,
+               pes.project_event_id,
+               ps.sys_type,
+               ps.status_name,
+               ps.project_status_id,
+               ps.status_type,
+               pes.use_status,
+               pes.init_status
+        from wk_project_event_status pes
+                 INNER JOIN wk_project_status ps on pes.project_status_id = ps.project_status_id
+        where pes.project_event_id = #{eventId}
+          and pes.use_status = #{useStatus}
+    </select>
+    <select id="queryEventStatusById" resultType="com.kakarote.work.entity.PO.ProjectEventStatus">
+        select pes.id,
+               pes.project_event_id,
+               ps.sys_type,
+               ps.status_name,
+               ps.project_status_id,
+               ps.status_type,
+               pes.init_status
+        from wk_project_event_status pes
+                 INNER JOIN wk_project_status ps on pes.project_status_id = ps.project_status_id
+        where pes.id = #{id}
+    </select>
+    <select id="applicationSchemeStatusList" resultType="com.kakarote.work.entity.PO.ProjectEventStatus">
+        select pes.id,
+               pes.project_event_id,
+               pes.use_status,
+               ps.sys_type,
+               ps.status_name,
+               ps.project_status_id,
+               ps.status_type,
+               pes.init_status,
+               pes.sorting
+        from wk_project_event_status pes
+                 INNER JOIN wk_project_status ps on pes.project_status_id = ps.project_status_id
+        where pes.project_event_id = #{eventId}
+       order by   pes.sorting asc
+/*          and (pes.use_status =0 or pes.use_status = 1)
+*/    </select>
+    <select id="applicationSchemeProjectStatusList" resultType="com.kakarote.work.entity.PO.ProjectEventStatus">
+        select pes.id,
+               pes.project_event_id,
+               pes.use_status,
+               ps.sys_type,
+               ps.status_name,
+               ps.project_status_id,
+               ps.status_type,
+               pes.init_status,
+               pes.sorting,
+               pes.project_id
+        from wk_project_event_status pes
+                 INNER JOIN wk_project_status ps on pes.project_status_id = ps.project_status_id
+        where pes.project_event_id = #{eventId}
+          and pes.project_id = #{projectId}
+        order by   pes.sorting asc
+/*          and (pes.use_status =0 or pes.use_status = 1)
+*/    </select>
+    <select id="queryEventStatusByStatusName" resultType="com.kakarote.work.entity.PO.ProjectEventStatus">
+        select  pes.* from wk_project_event_status pes INNER JOIN wk_project_status ps on pes.project_status_id=ps.project_status_id where
+            (pes.use_status=1 or pes.use_status=2) and  ps.status_name=#{statusName} and project_event_id=#{eventId}
+      and project_id=#{projectId} LIMIT 1
+    </select>
+</mapper>

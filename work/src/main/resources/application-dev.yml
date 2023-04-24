@@ -1,0 +1,29 @@
+spring:
+  redis:
+    host: 127.0.0.1
+    port: 6379
+    password: 123456
+    database: 12
+    lettuce:
+      pool:
+        max-active: 300
+  datasource:
+    url: jdbc:mysql://localhost:3306/wk_crm_table?characterEncoding=utf8&useSSL=false&zeroDateTimeBehavior=convertToNull&tinyInt1isBit=false&serverTimezone=Asia/Shanghai&useAffectedRows=true&allowPublicKeyRetrieval=true
+    username: root
+    password: root
+  jackson:
+    dateFormat: yyyy-MM-dd HH:mm:ss
+    timeZone: GMT+8
+wukong:
+  ids:
+    auth:
+      appId: 
+      clientId: 
+      clientSecret: 
+      requestUri: http://127.0.0.1:88/open/oauth2/token
+      redirectUri: http://127.0.0.1:44311/open/oauth2/token
+  common:
+    upload:
+      type: local
+      region: D:/wukong
+      domain: commonFile/download

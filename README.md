@@ -201,3 +201,8 @@ sh 72crm.sh start
 敬请期待
 ```
 ### 四、悟空项目管理功能模块预览
+![Image text](https://raw.githubusercontent.com/72wukong/72crm-pm-spring/main/img-folder/xmgl_1.png)
+![Image text](https://raw.githubusercontent.com/72wukong/72crm-pm-spring/main/img-folder/xmgl_2.png)
+![Image text](https://raw.githubusercontent.com/72wukong/72crm-pm-spring/main/img-folder/xmgl_3.png)
+![Image text](https://raw.githubusercontent.com/72wukong/72crm-pm-spring/main/img-folder/xmgl_4.png)
+![Image text](https://raw.githubusercontent.com/72wukong/72crm-pm-spring/main/img-folder/xmgl_5.png)

@@ -1,3 +1,6 @@
+Introduction to Wukong Project Management
+Wukong Project Management is officially open source. With Wukong CRM project management, you can help your team manage projects, quickly assign tasks to employees, keep up with progress through Gantt charts at any time, and improve enterprise management capabilities.
+
 # Wukong_PM
 
 
